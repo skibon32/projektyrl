@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>WeatherApp</title>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0"
+    />
+
+    <!-- Bootstrap CSS v5.2.1 -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-iYQeCzEYFbKjA/T2uDLTpkwGzCiq6soy8tYaI1GyVh/UjpbCx/TYkiZhlZB6+fzT"
+      crossorigin="anonymous"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+      integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+    <link rel="stylesheet" href="style.css" />
+    <link rel="icon" href="./assets/weather.png" type="image/png" />
+  </head>
+
+  <body>
+    <header>
+      <div class="nav-tools">
+        <button id="nav-button" class="fa fa-bars" title="Menu"></button>
+        <button class="fa fa-refresh" title="Odśwież"></button>
+        <button class="fa fa-map-marked" title="Pobierz Lokalizacje"></button>
+      </div>
+       <h1 class="m-2">Petarda Weather</h1>
+    </header>
+    <main>
+      <aside class="nav-aside">
+        <div class="input-container">
+        <label for="city-input ">Szukaj przez miasto</label>
+        <form class="input-comp">
+          <input
+            type="text"
+            class="form-control"
+            placeholder="Miasto..."
+            id="city-input"
+          />
+          <input
+            id="search"
+            type="submit"
+            class="btn btn-primary btn-sm"
+            value="Szukaj"
+          />
+        </form>
+      </div>
+        <ul class="nav-options">
+          <li id="weather-now">Pogoda Teraz</li>
+          <li id="weather-weakly">Tygodniowa</li>
+          <li>Wykres Temperatur</li>
+          <li>Jakość Powietrza</li>
+        </ul>
+      </aside>
+      <div id="main-window">
+      
+    </div>
+    </main>
+
+    <!-- Bootstrap JavaScript Libraries -->
+    <script
+      src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"
+      integrity="sha384-oBqDVmMz9ATKxIep9tiCxS/Z9fNfEXiDAYTujMAeBAsjFuCZSmKbSSUnQlmh/jp3"
+      crossorigin="anonymous"
+    ></script>
+
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/js/bootstrap.min.js"
+      integrity="sha384-7VPbUDkoPSGFnVtYi0QogXtr74QeVeeIs99Qfg5YCF+TidwNdjvaKZX19NZ/e6oz"
+      crossorigin="anonymous"
+    ></script>
+    <script src="code.js"></script>
+  </body>
+</html>
