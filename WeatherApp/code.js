@@ -1,8 +1,10 @@
+
 const main=document.querySelector("#main-window");
 class WeatherApp{
     weekdays=["Nie","Pon",'Wto',"Śro","Czw","Pią","Sob"];
     cityInput=document.querySelector("#city-input");
     menuState=false;
+    currentWindow=0;
     lon=undefined;
     lat=undefined;
     cityName=undefined;
@@ -24,28 +26,48 @@ class WeatherApp{
             this.menuState? document.querySelector(".nav-aside").classList.add("active"):document.querySelector(".nav-aside").classList.remove("active");
             
         })
+        document.querySelector("#nav-refresh").addEventListener("click",this.refresh);
+        document.querySelector("#nav-local-gps").addEventListener("click",()=>{
+            this.getDataFromGPS() ;
+            setTimeout(()=>this.refresh(),500)});
+    }
+    refresh=()=>{
+      switch(this.currentWindow){
+        case 0:
+          this.showCurrentWeather();
+        break;
+        case 1:
+          this.showWeaklyWeather();
+        break;
+      }
     }
     getDataByLocation(){
         let place=this.cityInput.value;
         if(place=="") return;
         fetch(`http://api.openweathermap.org/geo/1.0/direct?q=${place}&limit=5&appid=${this.apikey}`)
-        .then(res=>{
-            return res.json()
+          
+        .then(
+          res=>{
+            if(res.ok)return res.json()
+            
+            return Promise.reject(res);
         })
         .then(data=>{
             console.log(data)
             this.lon=data[1].lon;
             this.lat=data[1].lat;
-            data[1].hasOwnProperty("local_names.pl")?this.cityName=data[1].local_names.pl:this.cityName=data.name;
-
+            console.log(data[1]?.local_names?.pl)
+            data[1]?.local_names?.pl ?this.cityName=data[1].local_names.pl:this.cityName=data[1].name;
+            this.refresh();
         })
+        .catch(error=>console.log(error))
         
     }
     AddZeroTime(time){
       if(time<10)return "0"+time
       return time
     }
-    getDataFromGPS(){
+   getDataFromGPS(){
         navigator.geolocation.getCurrentPosition((pos)=>{
             this.lon=pos.coords.longitude;
             this.lat=pos.coords.latitude;
@@ -59,9 +81,11 @@ class WeatherApp{
     }
     insertData(data){
         let precipitation;
+        //przypisanie wartości do preception rain lub snow jeżeli api zwróci wartość
         if(data.hasOwnProperty('rain'))precipitation=data.rain["1h"];
         else if(data.hasOwnProperty('snow'))precipitation=data.snow["1h"];
         else precipitation=0;
+
         let timeNow=new Date();
         let sunUP=new Date(data.sys.sunrise*1000);
         let sunDOWN=new Date(data.sys.sunset*1000);
@@ -131,9 +155,11 @@ class WeatherApp{
     }
     showCurrentWeather=()=>{
         this.fetchDataByCoords();
+        this.currentWindow=0;
     }
     showWeaklyWeather=()=>{
       this.forecastFetch(); 
+      this.currentWindow=1;
 
     }
     forecastFetch(){
@@ -143,6 +169,7 @@ class WeatherApp{
         console.log(data)})
     }
     AddNewForecastCard(forecast,min,time){
+      //dodawanie nowej karty forecast
       return `<div class="forecast-container">
       <div class="forecast-item-container">
         <div class="week-day">${this.weekdays[time.getDay()]}</div>
@@ -166,6 +193,8 @@ class WeatherApp{
       
       let i=0;
       let currentTimestamp=(new Date());
+      let newDate = new Date(currentTimestamp)
+      //grupowanie danych forecastu po dniu miesiąca
       const groupByDate=data.list.reduce((group,item)=>{
         let date=new Date(item.dt*1000);
         if(group[date.getDate()]==null)group[date.getDate()]=[]
@@ -174,11 +203,15 @@ class WeatherApp{
       },{})
       
       console.log(groupByDate)
+      if(Object.keys(groupByDate)[0]!=(currentTimestamp).getDate()){
+          newDate.setHours(newDate.getHours() + 24);
+         currentTimestamp = newDate.getTime();}
       main.innerHTML=`<section id="forecast-window"></section>`;
       let temp1=document.querySelector("#forecast-window");
       for (const array in groupByDate){
         let temps=[]
-        for (const row of groupByDate[(new Date(currentTimestamp)).getDate()]){
+        for (const row of groupByDate[(new Date (currentTimestamp)).getDate()]){
+          
           
           temps.push(row.main.temp);
           }
@@ -187,12 +220,12 @@ class WeatherApp{
           let mntemp=Math.min(...temps)
           let indexofmaxtemp=temps.indexOf(mxtemp)
           
-          temp1.innerHTML+=this.AddNewForecastCard(groupByDate[(new Date(currentTimestamp)).getDate()][indexofmaxtemp],mntemp,(new Date(currentTimestamp)))
+          temp1.innerHTML+=this.AddNewForecastCard(groupByDate[(new Date (currentTimestamp)).getDate()][indexofmaxtemp],mntemp,(new Date(currentTimestamp)))
           
           i++
          
           //dodanie do currentDate 24 godzin
-          let newDate = new Date(currentTimestamp);
+          ;
           newDate.setHours(newDate.getHours() + 24);
           currentTimestamp = newDate.getTime();
           
@@ -204,9 +237,11 @@ class WeatherApp{
           
         }
       }
-      
+   
     
     
 };
 const app=new WeatherApp();
 window.onload=app.init();
+
+//

@@ -30,10 +30,10 @@
     <header>
       <div class="nav-tools">
         <button id="nav-button" class="fa fa-bars" title="Menu"></button>
-        <button class="fa fa-refresh" title="Odśwież"></button>
-        <button class="fa fa-map-marked" title="Pobierz Lokalizacje"></button>
+        <button id="nav-refresh" class="fa fa-refresh" title="Odśwież"></button>
+        <button id="nav-local-gps" class="fa fa-map-marked" title="Pobierz Lokalizacje"></button>
       </div>
-       <h1 class="m-2">Petarda Weather</h1>
+       <h1 class="logo">Petarda Weather</h1>
     </header>
     <main>
       <aside class="nav-aside">
@@ -62,7 +62,8 @@
         </ul>
       </aside>
       <div id="main-window">
-      
+        <div style="width: 800px;"><canvas id="acquisitions"></canvas></div>
+
     </div>
     </main>
 
