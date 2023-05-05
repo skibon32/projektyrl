@@ -68,6 +68,7 @@ class WeatherApp{
         
     }
     groupDataByDate(data){
+      //grupowanie danych forecastu po dniu miesiąca
       const groupByDate=data.list.reduce((group,item)=>{
         let date=new Date(item.dt*1000);
         if(group[date.getDate()]==null)group[date.getDate()]=[]
@@ -221,7 +222,7 @@ class WeatherApp{
       let i=0;
       let currentTimestamp=(new Date());
       let newDate = new Date(currentTimestamp)
-      //grupowanie danych forecastu po dniu miesiąca
+      
       const groupByDate=this.groupDataByDate(data)
       
       console.log(groupByDate)
