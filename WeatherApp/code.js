@@ -4,14 +4,17 @@ class WeatherApp{
     weekdays=["Nie","Pon",'Wto',"Śro","Czw","Pią","Sob"];
     cityInput=document.querySelector("#city-input");
     menuState=false;
+    
     currentWindow=0;
     lon=undefined;
     lat=undefined;
     cityName=undefined;
     apikey="b5c81a9405bb5f44fd5ce751e9b339e6";
     init(){
+       
         this.getDataFromGPS()
         this.events();
+        
     }
     events(){
         document.querySelector("#search").addEventListener("click",(e)=>{
@@ -21,15 +24,18 @@ class WeatherApp{
         })
         document.querySelector("#weather-now").addEventListener("click",this.showCurrentWeather);
         document.querySelector("#weather-weakly").addEventListener("click",this.showWeaklyWeather);
+        document.querySelector("#weather-chart").addEventListener("click",this.chart);
         document.querySelector("#nav-button").addEventListener("click",()=>{
             this.menuState=!this.menuState;
             this.menuState? document.querySelector(".nav-aside").classList.add("active"):document.querySelector(".nav-aside").classList.remove("active");
             
         })
         document.querySelector("#nav-refresh").addEventListener("click",this.refresh);
-        document.querySelector("#nav-local-gps").addEventListener("click",()=>{
-            this.getDataFromGPS() ;
-            setTimeout(()=>this.refresh(),500)});
+        document.querySelector("#nav-local-gps").addEventListener("click",async()=>{
+            await this.getDataFromGPS();
+            console.log('elo321');
+            this.refresh();
+        })
     }
     refresh=()=>{
       switch(this.currentWindow){
@@ -41,16 +47,14 @@ class WeatherApp{
         break;
       }
     }
-    getDataByLocation(){
+    async getDataByLocation(){
         let place=this.cityInput.value;
         if(place=="") return;
-        fetch(`http://api.openweathermap.org/geo/1.0/direct?q=${place}&limit=5&appid=${this.apikey}`)
+        return fetch(`http://api.openweathermap.org/geo/1.0/direct?q=${place}&limit=5&appid=${this.apikey}`)
           
         .then(
           res=>{
             if(res.ok)return res.json()
-            
-            return Promise.reject(res);
         })
         .then(data=>{
             console.log(data)
@@ -63,24 +67,47 @@ class WeatherApp{
         .catch(error=>console.log(error))
         
     }
+    groupDataByDate(data){
+      const groupByDate=data.list.reduce((group,item)=>{
+        let date=new Date(item.dt*1000);
+        if(group[date.getDate()]==null)group[date.getDate()]=[]
+        group[date.getDate()].push(item);
+        return group
+      },{})
+      return groupByDate;
+    }
     AddZeroTime(time){
       if(time<10)return "0"+time
       return time
     }
-   getDataFromGPS(){
-        navigator.geolocation.getCurrentPosition((pos)=>{
-            this.lon=pos.coords.longitude;
-            this.lat=pos.coords.latitude;
-            this.cityName=undefined;
-        });
+    async getDataFromGPS() {
+      return new Promise((resolve, reject) => {
+        navigator.geolocation.getCurrentPosition(
+          (pos) => {
+            this.lon = pos.coords.longitude;
+            this.lat = pos.coords.latitude;
+            this.cityName = undefined;
+            resolve(pos);
+          },
+          (error) => {
+            reject(error);
+          }
+        );
+      });
     }
-    fetchDataByCoords(){
-        fetch(`https://api.openweathermap.org/data/2.5/weather?lat=${this.lat}&lon=${this.lon}&appid=${this.apikey}&units=metric&lang=pl`)
+    async fetchDataByCoords(){
+       return fetch(`https://api.openweathermap.org/data/2.5/weather?lat=${this.lat}&lon=${this.lon}&appid=${this.apikey}&units=metric&lang=pl`)
         .then(response=>response.json())
-        .then(data=>{this.insertData(data)})
+        .then(data=>{
+          console.log(data)
+          return data})
+        
     }
-    insertData(data){
+    async insertData(){
         let precipitation;
+        console.log("działa")
+        const data=await this.fetchDataByCoords()
+        console.log(data)
         //przypisanie wartości do preception rain lub snow jeżeli api zwróci wartość
         if(data.hasOwnProperty('rain'))precipitation=data.rain["1h"];
         else if(data.hasOwnProperty('snow'))precipitation=data.snow["1h"];
@@ -154,19 +181,19 @@ class WeatherApp{
         
     }
     showCurrentWeather=()=>{
-        this.fetchDataByCoords();
+        this.insertData();
         this.currentWindow=0;
+        
     }
     showWeaklyWeather=()=>{
-      this.forecastFetch(); 
+      this.insertForecastData(); 
       this.currentWindow=1;
 
     }
-    forecastFetch(){
-      fetch(`https://api.openweathermap.org/data/2.5/forecast?lat=${this.lat}&lon=${this.lon}&appid=${this.apikey}&lang=pl&units=metric`)
+    async forecastFetch(){
+      return fetch(`https://api.openweathermap.org/data/2.5/forecast?lat=${this.lat}&lon=${this.lon}&appid=${this.apikey}&lang=pl&units=metric`)
       .then(res=>res.json())
-      .then(data=>{this.insertForecastData(data)
-        console.log(data)})
+      .then(data=>data)
     }
     AddNewForecastCard(forecast,min,time){
       //dodawanie nowej karty forecast
@@ -189,18 +216,13 @@ class WeatherApp{
         </div>
       </div>`;
     }
-    insertForecastData(data){
-      
+    async insertForecastData(){
+      const data=await this.forecastFetch();
       let i=0;
       let currentTimestamp=(new Date());
       let newDate = new Date(currentTimestamp)
       //grupowanie danych forecastu po dniu miesiąca
-      const groupByDate=data.list.reduce((group,item)=>{
-        let date=new Date(item.dt*1000);
-        if(group[date.getDate()]==null)group[date.getDate()]=[]
-        group[date.getDate()].push(item);
-        return group
-      },{})
+      const groupByDate=this.groupDataByDate(data)
       
       console.log(groupByDate)
       if(Object.keys(groupByDate)[0]!=(currentTimestamp).getDate()){
@@ -222,10 +244,10 @@ class WeatherApp{
           
           temp1.innerHTML+=this.AddNewForecastCard(groupByDate[(new Date (currentTimestamp)).getDate()][indexofmaxtemp],mntemp,(new Date(currentTimestamp)))
           
-          i++
+          i++;
          
           //dodanie do currentDate 24 godzin
-          ;
+        
           newDate.setHours(newDate.getHours() + 24);
           currentTimestamp = newDate.getTime();
           
@@ -237,7 +259,33 @@ class WeatherApp{
           
         }
       }
-   
+    chart=async()=>{
+    const data=await this.forecastFetch();
+    main.innerHTML=`<div class="chart-container"><canvas id="myChart"></canvas></div>`
+    let temp3=[]
+    let labels=[]
+    console.log(data)
+    data.list.forEach(el=>{
+      temp3.push(el.main.temp);
+      labels.push(el.dt_txt);
+    })
+    console.log(temp3);
+    var ctx = document.getElementById('myChart').getContext('2d');
+		var myChart = new Chart(ctx, {
+			type: 'line',
+			data: {
+				labels: labels,
+				datasets: [{
+					label: 'Wykres temperatury',
+					data: temp3,
+					fill: true,
+					borderColor: 'rgb(255, 99, 132)',
+					tension: 0.1
+				}]
+			},
+			options: {}
+		});
+   }
     
     
 };

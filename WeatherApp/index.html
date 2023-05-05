@@ -2,6 +2,7 @@
 <html lang="en">
   <head>
     <title>WeatherApp</title>
+    
     <meta charset="utf-8" />
     <meta
       name="viewport"
@@ -24,6 +25,7 @@
     />
     <link rel="stylesheet" href="style.css" />
     <link rel="icon" href="./assets/weather.png" type="image/png" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   </head>
 
   <body>
@@ -57,17 +59,18 @@
         <ul class="nav-options">
           <li id="weather-now">Pogoda Teraz</li>
           <li id="weather-weakly">Tygodniowa</li>
-          <li>Wykres Temperatur</li>
+          <li id="weather-chart">Wykres Temperatur</li>
           <li>Jakość Powietrza</li>
         </ul>
       </aside>
       <div id="main-window">
-        <div style="width: 800px;"><canvas id="acquisitions"></canvas></div>
+        
 
     </div>
     </main>
-
+    
     <!-- Bootstrap JavaScript Libraries -->
+   
     <script
       src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"
       integrity="sha384-oBqDVmMz9ATKxIep9tiCxS/Z9fNfEXiDAYTujMAeBAsjFuCZSmKbSSUnQlmh/jp3"
@@ -80,5 +83,7 @@
       crossorigin="anonymous"
     ></script>
     <script src="code.js"></script>
+    
+    
   </body>
 </html>
