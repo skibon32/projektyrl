@@ -33,7 +33,6 @@ class WeatherApp{
         document.querySelector("#nav-refresh").addEventListener("click",this.refresh);
         document.querySelector("#nav-local-gps").addEventListener("click",async()=>{
             await this.getDataFromGPS();
-            console.log('elo321');
             this.refresh();
         })
     }
@@ -45,7 +44,11 @@ class WeatherApp{
         case 1:
           this.showWeaklyWeather();
         break;
+        case 2:
+          this.chart();
+        break;
       }
+      
     }
     async getDataByLocation(){
         let place=this.cityInput.value;
@@ -60,7 +63,6 @@ class WeatherApp{
             console.log(data)
             this.lon=data[1].lon;
             this.lat=data[1].lat;
-            console.log(data[1]?.local_names?.pl)
             data[1]?.local_names?.pl ?this.cityName=data[1].local_names.pl:this.cityName=data[1].name;
             this.refresh();
         })
@@ -91,7 +93,7 @@ class WeatherApp{
             resolve(pos);
           },
           (error) => {
-            reject(error);
+            reject(error,"elo");
           }
         );
       });
@@ -99,16 +101,12 @@ class WeatherApp{
     async fetchDataByCoords(){
        return fetch(`https://api.openweathermap.org/data/2.5/weather?lat=${this.lat}&lon=${this.lon}&appid=${this.apikey}&units=metric&lang=pl`)
         .then(response=>response.json())
-        .then(data=>{
-          console.log(data)
-          return data})
+        .then(data=>data)
         
     }
     async insertData(){
         let precipitation;
-        console.log("działa")
         const data=await this.fetchDataByCoords()
-        console.log(data)
         //przypisanie wartości do preception rain lub snow jeżeli api zwróci wartość
         if(data.hasOwnProperty('rain'))precipitation=data.rain["1h"];
         else if(data.hasOwnProperty('snow'))precipitation=data.snow["1h"];
@@ -223,9 +221,7 @@ class WeatherApp{
       let currentTimestamp=(new Date());
       let newDate = new Date(currentTimestamp)
       
-      const groupByDate=this.groupDataByDate(data)
-      
-      console.log(groupByDate)
+      const groupByDate=this.groupDataByDate(data);
       if(Object.keys(groupByDate)[0]!=(currentTimestamp).getDate()){
           newDate.setHours(newDate.getHours() + 24);
          currentTimestamp = newDate.getTime();}
@@ -262,30 +258,53 @@ class WeatherApp{
       }
     chart=async()=>{
     const data=await this.forecastFetch();
+    const groupByData= await this.groupDataByDate(data);
     main.innerHTML=`<div class="chart-container"><canvas id="myChart"></canvas></div>`
     let temp3=[]
-    let labels=[]
-    console.log(data)
-    data.list.forEach(el=>{
-      temp3.push(el.main.temp);
-      labels.push(el.dt_txt);
+    let labels=["00:00","03:00","06:00","09:00","12:00","15:00","18:00","21:00"]
+    console.log(groupByData)
+    let q=(new Date(groupByData[10][0].dt_txt)).getHours()
+    let shiftamount=(labels.indexOf(`${this.AddZeroTime(q)}:00`))
+    for(let i=0;i<shiftamount;i++){
+      temp3.push(null)
+    }
+    groupByData[10].forEach((el,index)=>{
+      temp3.push(Math.round(el.main.temp))
     })
-    console.log(temp3);
     var ctx = document.getElementById('myChart').getContext('2d');
 		var myChart = new Chart(ctx, {
 			type: 'line',
 			data: {
 				labels: labels,
 				datasets: [{
-					label: 'Wykres temperatury',
+					label: "Temperatura",
 					data: temp3,
 					fill: true,
 					borderColor: 'rgb(255, 99, 132)',
-					tension: 0.1
+					tension: 0.7,
+          legend:{
+            legendItems:{
+              fontColor:"rgb(255,255,255)"
+            }
+          }
+          
 				}]
 			},
-			options: {}
-		});
+			options: {
+        plugins: {
+          legend: {
+              labels: {
+                  // This more specific font property overrides the global property
+                  font: {
+                      size: 20
+                  }
+              }
+          }
+      },
+      responsive: true,
+      
+      }
+		});console.log(myChart)
    }
     
     
@@ -293,4 +312,18 @@ class WeatherApp{
 const app=new WeatherApp();
 window.onload=app.init();
 
-//
+// var ctx = document.getElementById('myChart').getContext('2d');
+// var myChart = new Chart(ctx, {
+//   type: 'line',
+//   data: {
+//     labels: labels,
+//     datasets: [{
+//       label: 'Wykres temperatury',
+//       data: temp3,
+//       fill: true,
+//       borderColor: 'rgb(255, 99, 132)',
+//       tension: 0.1
+//     }]
+//   },
+//   options: {}
+// }); 
