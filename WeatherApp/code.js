@@ -294,7 +294,7 @@ class WeatherApp{
         plugins: {
           legend: {
               labels: {
-                  // This more specific font property overrides the global property
+                  
                   font: {
                       size: 20
                   }
@@ -302,6 +302,7 @@ class WeatherApp{
           }
       },
       responsive: true,
+      maintainAspectRatio: true,
       
       }
 		});console.log(myChart)
@@ -312,18 +313,3 @@ class WeatherApp{
 const app=new WeatherApp();
 window.onload=app.init();
 
-// var ctx = document.getElementById('myChart').getContext('2d');
-// var myChart = new Chart(ctx, {
-//   type: 'line',
-//   data: {
-//     labels: labels,
-//     datasets: [{
-//       label: 'Wykres temperatury',
-//       data: temp3,
-//       fill: true,
-//       borderColor: 'rgb(255, 99, 132)',
-//       tension: 0.1
-//     }]
-//   },
-//   options: {}
-// }); 
