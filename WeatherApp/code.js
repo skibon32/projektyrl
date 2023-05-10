@@ -11,9 +11,10 @@ class WeatherApp{
     cityName=undefined;
     apikey="b5c81a9405bb5f44fd5ce751e9b339e6";
     init(){
-       
+        
         this.getDataFromGPS()
         this.events();
+        
         
     }
     events(){
@@ -21,10 +22,17 @@ class WeatherApp{
            e.preventDefault();
            this.getDataByLocation();
            this.cityInput.value=""
+           this.cityInput.removeAttribute("required")
         })
-        document.querySelector("#weather-now").addEventListener("click",this.showCurrentWeather);
-        document.querySelector("#weather-weakly").addEventListener("click",this.showWeaklyWeather);
-        document.querySelector("#weather-chart").addEventListener("click",this.chart);
+        document.querySelector("#weather-now").addEventListener("click",()=>{
+          if(this.lat===undefined)return
+          this.showCurrentWeather()});
+        document.querySelector("#weather-weakly").addEventListener("click",()=>{
+          if(this.lat===undefined)return
+          this.showWeaklyWeather()});
+        document.querySelector("#weather-chart").addEventListener("click",()=>{
+          if(this.lat===undefined)return
+          this.chart()});
         document.querySelector("#nav-button").addEventListener("click",()=>{
             this.menuState=!this.menuState;
             this.menuState? document.querySelector(".nav-aside").classList.add("active"):document.querySelector(".nav-aside").classList.remove("active");
@@ -35,6 +43,9 @@ class WeatherApp{
             await this.getDataFromGPS();
             this.refresh();
         })
+        document.querySelector("#modal-close").addEventListener("click",()=>{
+          this.cityInput.setAttribute("required","");
+          document.querySelector("#gpsmodal").close()});
     }
     refresh=()=>{
       switch(this.currentWindow){
@@ -93,7 +104,8 @@ class WeatherApp{
             resolve(pos);
           },
           (error) => {
-            reject(error,"elo");
+            document.querySelector("#gpsmodal").showModal();
+            document.querySelectorAll(".nav-options>li").forEach(el=>el.classList.add("disabled"))
           }
         );
       });
@@ -209,10 +221,6 @@ class WeatherApp{
             <div class="forecast-item-maxtemp">${Math.round(forecast.main.temp)}°C</div>
             <div class="forecast-item-mintemp">${Math.round(min)}°C</div>
         </div>
-        <div class="forecast-item-container">
-          <div class="forecast-sunrise></div>
-          <div class="forecast-sunset></div>
-        </div>
       </div>`;
     }
     async insertForecastData(){
@@ -258,56 +266,102 @@ class WeatherApp{
       }
     chart=async()=>{
     const data=await this.forecastFetch();
-    const groupByData= await this.groupDataByDate(data);
-    main.innerHTML=`<div class="chart-container"><canvas id="myChart"></canvas></div>`
-    let temp3=[]
-    let labels=["00:00","03:00","06:00","09:00","12:00","15:00","18:00","21:00"]
-    console.log(groupByData)
-    let q=(new Date(groupByData[10][0].dt_txt)).getHours()
-    let shiftamount=(labels.indexOf(`${this.AddZeroTime(q)}:00`))
-    for(let i=0;i<shiftamount;i++){
-      temp3.push(null)
-    }
-    groupByData[10].forEach((el,index)=>{
-      temp3.push(Math.round(el.main.temp))
-    })
-    var ctx = document.getElementById('myChart').getContext('2d');
-		var myChart = new Chart(ctx, {
-			type: 'line',
-			data: {
-				labels: labels,
-				datasets: [{
-					label: "Temperatura",
-					data: temp3,
-					fill: true,
-					borderColor: 'rgb(255, 99, 132)',
-					tension: 0.7,
-          legend:{
-            legendItems:{
-              fontColor:"rgb(255,255,255)"
-            }
-          }
-          
-				}]
-			},
-			options: {
-        plugins: {
-          legend: {
-              labels: {
-                  
-                  font: {
-                      size: 20
-                  }
-              }
-          }
-      },
-      responsive: true,
-      maintainAspectRatio: true,
-      
-      }
-		});console.log(myChart)
-   }
+    const groupByData=this.groupDataByDate(data);
+    main.innerHTML=`<div class="chart-container"><button id="previous-chart" class="chart-buttons fa fa-arrow-left fa-soild"></button><canvas id="myChart"></canvas><button id="next-chart" class="chart-buttons fa fa-arrow-right fa-soild"></button></div>`
+    this.currentWindow=2;
+    let labels=["00:00","03:00","06:00","09:00","12:00","15:00","18:00","21:00"];
+    let currentTimestamp=(new Date());
+    let newDate = new Date(currentTimestamp);
     
+    
+    function drawChart(){
+      
+      if (Chart.getChart('myChart')) {
+        Chart.getChart('myChart').destroy();
+      }
+      let temps=[]
+      
+      
+    let q=(new Date(groupByData[new Date(currentTimestamp).getDate()][0].dt_txt)).getHours()
+    let shiftamount=(labels.indexOf(`${app.AddZeroTime(q)}:00`))
+      for(let i=0;i<shiftamount;i++){
+        temps.push(null)
+      }
+      groupByData[new Date(currentTimestamp).getDate()].forEach((el)=>{
+        temps.push(Math.round(el.main.temp))
+      })
+      const min=Math.min(...temps)-2;
+      const max=Math.max(...temps)+2;
+      var ctx = document.getElementById('myChart').getContext('2d');
+      var myChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: labels,
+          datasets: [{
+            label: `${groupByData[new Date(currentTimestamp).getDate()][0].dt_txt} °C `,
+            data: temps,
+            fill: true,
+            borderColor: 'rgb(255, 99, 132)',
+            tension: 0.2,
+          },
+        ]
+        },
+        options: {
+          plugins: {
+            legend: {
+                labels: {     
+                    font: {
+                        size: 20
+                    }
+                }
+            }
+          },
+          scales: {
+            y: {
+              min:min,
+                max: max,
+              ticks: {
+                stepSize:1,
+                fontSize: 50
+              }
+            }
+          },
+        responsive: true,
+        maintainAspectRatio: false,
+        }
+      })
+    }
+    drawChart();
+    let w=new Date().getDate()+5;
+  function nextChart(){
+    if(new Date(currentTimestamp).getDate()===w){
+      newDate.setHours(newDate.getHours() - 120);
+          currentTimestamp = newDate.getTime();
+    }
+    else{
+      newDate.setHours(newDate.getHours() + 24);
+      currentTimestamp = newDate.getTime();
+    }
+      
+          drawChart();
+  }
+  document.querySelector("#next-chart").addEventListener("click",nextChart);
+  function prevChart(){
+    if(new Date(currentTimestamp).getDate()===new Date().getDate()){
+      
+      
+      newDate.setHours(newDate.getHours() + 120);
+          currentTimestamp = newDate.getTime();
+    }
+    else{
+   
+    newDate.setHours(newDate.getHours() - 24);
+          currentTimestamp = newDate.getTime();}
+          drawChart();
+  }
+  document.querySelector("#previous-chart").addEventListener("click",prevChart);
+   }
+  
     
 };
 const app=new WeatherApp();
