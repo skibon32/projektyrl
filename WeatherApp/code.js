@@ -87,6 +87,10 @@ class WeatherApp{
             if(res.ok)return res.json()
         })
         .then(data=>{
+          console.log(data.length)
+          if(data.length===0){
+            alert("Brak Wyników")
+          }
           this.autocompleteErase();
           data.forEach((el)=>{
             const newchild=document.createElement("div")
@@ -126,6 +130,7 @@ class WeatherApp{
             this.lat = pos.coords.latitude;
             this.cityName = undefined;
             resolve(pos);
+            this.showCurrentWeather();
           },
           (error) => {
             document.querySelector("#gpsmodal").showModal();
@@ -143,15 +148,15 @@ class WeatherApp{
     async insertData(){
         let precipitation;
         const data=await this.fetchDataByCoords()
-        
+        console.log(data)
         //przypisanie wartości do preception rain lub snow jeżeli api zwróci wartość
         if(data.hasOwnProperty('rain'))precipitation=data.rain["1h"];
         else if(data.hasOwnProperty('snow'))precipitation=data.snow["1h"];
         else precipitation=0;
 
-        let timeNow=new Date();
-        let sunUP=new Date(data.sys.sunrise*1000);
-        let sunDOWN=new Date(data.sys.sunset*1000);
+        let timeNow=new Date((data.dt+data.timezone-7200)*1000);
+        let sunUP=new Date((data.sys.sunrise+data.timezone-7200)*1000);
+        let sunDOWN=new Date((data.sys.sunset+data.timezone-7200)*1000);
         main.innerHTML=`
         <section class="weather-main">
         <div class="basic-info">
@@ -219,11 +224,15 @@ class WeatherApp{
     showCurrentWeather=()=>{
         this.insertData();
         this.currentWindow=0;
+        this.menuState=false;
+        document.querySelector(".nav-aside").classList.remove("active");
         
     }
     showWeaklyWeather=()=>{
       this.insertForecastData(); 
       this.currentWindow=1;
+      this.menuState=false;
+      document.querySelector(".nav-aside").classList.remove("active");
 
     }
     async forecastFetch(){
@@ -292,6 +301,8 @@ class WeatherApp{
     chart=async()=>{
     const data=await this.forecastFetch();
     let datalist=data.list
+    this.menuState=false;
+    document.querySelector(".nav-aside").classList.remove("active");
     main.innerHTML=`<div class="chart-container"><canvas id="myChart"></canvas></div>`
     this.currentWindow=2;
     let temps=[];

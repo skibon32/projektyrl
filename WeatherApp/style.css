@@ -36,6 +36,8 @@ body{
     margin: 0;
     padding:0;
     width: 100%;
+    border-radius: 1em;
+    overflow: hidden;
 }
 .autocomplete-container{
     display: flex;
@@ -44,21 +46,24 @@ body{
     cursor: pointer;
     transition: all 0.5s;
     
-    background-color: rgba(34, 85, 255, 0.8);
+    background-color: rgba(133, 161, 255, 0.8);
     padding: 0.5em;
     border-bottom: 1px solid black;
     font-size: 1.1em;
     font-weight: 500;
+    backdrop-filter: blur(30px);
+    
 
 }
 .autocomplete-container:hover{
     background-color: rgba(34, 85, 255,1);
 }
-.autocomplete-city>div,.autocomplete-container :is(:first-child){
+.autocomplete-city>div:first-child{
     border-radius: 1em 1em 0 0 ;
 }
 .autocomplete-city>div:last-child{
     border-radius:0 0 1em 1em;
+    
 }
 .map-button{
     align-self: center;
@@ -86,6 +91,11 @@ body{
 }
 .logo{
     margin: 0 1em;
+    font-size: minmax(1.3rem,3rem);
+    -webkit-text-stroke: 2px rgb(5, 5, 5);
+    color:white;
+    text-shadow: 5px 5px black;
+    
 }
 header{
     display: flex;
@@ -216,7 +226,7 @@ main{
     padding: 0.5em;
 }
 #myChart{
-    
+    min-height: 100%;
     max-width: 95%;
 }
 .chart-buttons{
@@ -549,7 +559,7 @@ main{
         height: auto;
     }
     .logo{
-        font-size: 1.2rem;
+        
         margin: 0;
         padding: 0;
     }
@@ -569,6 +579,7 @@ main{
     .weather-main div:nth-child(1){
         grid-column: 1;
         grid-row:1;
+        flex-direction: column;
     }
     .weather-main div:nth-child(10){
         grid-column: 1;
