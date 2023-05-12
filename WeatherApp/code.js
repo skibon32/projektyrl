@@ -4,13 +4,16 @@ class WeatherApp{
     weekdays=["Nie","Pon",'Wto',"Śro","Czw","Pią","Sob"];
     cityInput=document.querySelector("#city-input");
     menuState=false;
-    
     autocomplete=document.querySelector(".autocomplete-city");
     currentWindow=0;
     lon=undefined;
     lat=undefined;
     cityName=undefined;
+
+    //to powinno być schowane
     apikey="b5c81a9405bb5f44fd5ce751e9b339e6";
+    
+
     init(){
         
         this.getDataFromGPS()
@@ -19,36 +22,45 @@ class WeatherApp{
         
     }
     events(){
+      //przycisk szukaj
         document.querySelector("#search").addEventListener("click",(e)=>{
            e.preventDefault();
            this.getDataByLocation();
            this.cityInput.value=""
            this.cityInput.removeAttribute("required")
         })
+        //przycisk pogoda teraz
         document.querySelector("#weather-now").addEventListener("click",()=>{
           if(this.lat===undefined)return
           this.showCurrentWeather()});
+        //przycisk Tygodniowa
         document.querySelector("#weather-weakly").addEventListener("click",()=>{
           if(this.lat===undefined)return
           this.showWeaklyWeather()});
+        //przycisk Wykres
         document.querySelector("#weather-chart").addEventListener("click",()=>{
           if(this.lat===undefined)return
           this.chart()});
+        //przycisk pokaż/chowaj menu dla widoku mobile
         document.querySelector("#nav-button").addEventListener("click",()=>{
             this.menuState=!this.menuState;
             this.menuState? document.querySelector(".nav-aside").classList.add("active"):document.querySelector(".nav-aside").classList.remove("active");
             
         })
+        //przycisk odswiezenie danych
         document.querySelector("#nav-refresh").addEventListener("click",this.refresh);
+        //przycisk pobrania aktualnej pozycji uzytkownika jezeli dostepne
         document.querySelector("#nav-local-gps").addEventListener("click",async()=>{
             await this.getDataFromGPS();
             this.refresh();
         })
+        //okienko dialog
         document.querySelector("#modal-close").addEventListener("click",()=>{
           this.cityInput.setAttribute("required","");
           document.querySelector("#gpsmodal").close()});
     }
     refresh=()=>{
+      //odświezenie dla aktulanej kategorii po numerze
       switch(this.currentWindow){
         case 0:
           this.showCurrentWeather();
@@ -63,6 +75,7 @@ class WeatherApp{
       
     }
     autocompleteLi(data){
+      //wypisannie nowej karty z koordynatami do wyboru
       return `<div class="autocomplete-container">
       <div class="autocomplete-name-country"><div class="m-1">${data.local_names?.pl || data.name}</div>
       <div class="m-1">${data.country}</div></div>
@@ -74,10 +87,11 @@ class WeatherApp{
 
     }
     autocompleteErase(){
+      //usuwanie kart autocomplete
       this.autocomplete.innerHTML="";
     }
     async getDataByLocation(){
-        
+        //pobieranie kodrdynatów przez miejscowość wpisaną w cityInput
         let place=this.cityInput.value;
         if(place=="") return;
         return fetch(`https://api.openweathermap.org/geo/1.0/direct?q=${place}&limit=5&appid=${this.apikey}`)
@@ -87,11 +101,12 @@ class WeatherApp{
             if(res.ok)return res.json()
         })
         .then(data=>{
-          console.log(data.length)
+          
           if(data.length===0){
             alert("Brak Wyników")
           }
           this.autocompleteErase();
+          //pętla tworząca nowe karty do autocomplete
           data.forEach((el)=>{
             const newchild=document.createElement("div")
             newchild.innerHTML=this.autocompleteLi(el);
@@ -109,7 +124,7 @@ class WeatherApp{
         
     }
     groupDataByDate(data){
-      //grupowanie danych forecastu po dniu miesiąca
+      //grupowanie danych po dniu miesiąca
       const groupByDate=data.list.reduce((group,item)=>{
         let date=new Date(item.dt*1000);
         if(group[date.getDate()]==null)group[date.getDate()]=[]
@@ -123,6 +138,7 @@ class WeatherApp{
       return time
     }
     async getDataFromGPS() {
+      //pobieranie pozycji użytkownika w promise
       return new Promise((resolve, reject) => {
         navigator.geolocation.getCurrentPosition(
           (pos) => {
@@ -133,6 +149,7 @@ class WeatherApp{
             this.showCurrentWeather();
           },
           (error) => {
+            //kiedy użytkownik ma WYŁĄCZONĄ lokalizacje
             document.querySelector("#gpsmodal").showModal();
             document.querySelector(".nav-aside").classList.add("active")
           }
@@ -140,6 +157,7 @@ class WeatherApp{
       });
     }
     async fetchDataByCoords(){
+      //pobieranie danych pogody teraz po koordynatach
        return fetch(`https://api.openweathermap.org/data/2.5/weather?lat=${this.lat}&lon=${this.lon}&appid=${this.apikey}&units=metric&lang=pl`)
         .then(response=>response.json())
         .then(data=>data)
@@ -148,12 +166,12 @@ class WeatherApp{
     async insertData(){
         let precipitation;
         const data=await this.fetchDataByCoords()
-        console.log(data)
+        
         //przypisanie wartości do preception rain lub snow jeżeli api zwróci wartość
         if(data.hasOwnProperty('rain'))precipitation=data.rain["1h"];
         else if(data.hasOwnProperty('snow'))precipitation=data.snow["1h"];
         else precipitation=0;
-
+        //korekta strefy czasowej
         let timeNow=new Date((data.dt+data.timezone-7200)*1000);
         let sunUP=new Date((data.sys.sunrise+data.timezone-7200)*1000);
         let sunDOWN=new Date((data.sys.sunset+data.timezone-7200)*1000);
@@ -222,26 +240,31 @@ class WeatherApp{
         
     }
     showCurrentWeather=()=>{
+      //pokazanie okna pogoda teraz
         this.insertData();
         this.currentWindow=0;
+        //schowanie panelu nawigacyjnego po wywołaniu w widoku mobile
         this.menuState=false;
         document.querySelector(".nav-aside").classList.remove("active");
         
     }
     showWeaklyWeather=()=>{
+      //pokazanie okna prognozy pogody na 5 dni
       this.insertForecastData(); 
       this.currentWindow=1;
+       //schowanie panelu nawigacyjnego po wywołaniu w widoku mobile
       this.menuState=false;
       document.querySelector(".nav-aside").classList.remove("active");
 
     }
     async forecastFetch(){
+      //pobieranie prognozy pogody po koordynatach
       return fetch(`https://api.openweathermap.org/data/2.5/forecast?lat=${this.lat}&lon=${this.lon}&appid=${this.apikey}&lang=pl&units=metric`)
       .then(res=>res.json())
       .then(data=>data)
     }
     AddNewForecastCard(forecast,min,time){
-      //dodawanie nowej karty forecast
+      //wypisanie nowej karty forecast
       return `<div class="forecast-container">
       <div class="forecast-item-container">
         <div class="week-day">${this.weekdays[time.getDay()]}</div>
@@ -262,17 +285,19 @@ class WeatherApp{
       let i=0;
       let currentTimestamp=(new Date());
       let newDate = new Date(currentTimestamp)
-      console.log(data)
       const groupByDate=this.groupDataByDate(data);
+      //korekta wyświetlanego pierwszego dnia
       if(Object.keys(groupByDate)[0]!=(currentTimestamp).getDate()){
           newDate.setHours(newDate.getHours() + 24);
          currentTimestamp = newDate.getTime();}
+
+
       main.innerHTML=`<section id="forecast-window"></section>`;
       let temp1=document.querySelector("#forecast-window");
       for (const array in groupByDate){
         let temps=[]
         for (const row of groupByDate[(new Date (currentTimestamp)).getDate()]){
-          
+          //pushowanie temperatur z danego dnia
           
           temps.push(row.main.temp);
           }
@@ -280,19 +305,14 @@ class WeatherApp{
           let mxtemp=Math.max(...temps)
           let mntemp=Math.min(...temps)
           let indexofmaxtemp=temps.indexOf(mxtemp)
-          
+          //dodanie do temp1 nowych kart przez addNewForecast dane : aktualny dzień miesiąca, minimalna temperatura z danego dnia, data danego dnia
           temp1.innerHTML+=this.AddNewForecastCard(groupByDate[(new Date (currentTimestamp)).getDate()][indexofmaxtemp],mntemp,(new Date(currentTimestamp)))
           
           i++;
          
           //dodanie do currentDate 24 godzin
-        
           newDate.setHours(newDate.getHours() + 24);
           currentTimestamp = newDate.getTime();
-          
-          
-          
-         
           temps=[];
           if(i>4)break ;
           
@@ -308,14 +328,21 @@ class WeatherApp{
     let temps=[];
     let labels=[];
     for(let i=0;i<=8;i++){
+      //dodanie 8 następnych danych z arraya do wykresu
       const labeltime=new Date(datalist[i].dt_txt);
+      //pushowanie temperatury z danej godziny
       temps.push(Math.round(datalist[i].main.temp))
+      //pushowanie czasu do label
       labels.push(`${this.AddZeroTime(labeltime.getHours())}:${this.AddZeroTime(labeltime.getMinutes())}`) 
     }
     
-
+      
       const min=Math.min(...temps)-2;
+      //dodanie 2 kolejnych liczb pod najniższa temperature z dnia
+
       const max=Math.max(...temps)+2;
+      //dodanie 2 kolejnych liczb nad najwyższą temperature z dnia
+
       var ctx = document.getElementById('myChart').getContext('2d');
       var myChart = new Chart(ctx, {
         type: 'line',
@@ -366,6 +393,22 @@ window.onload=app.init();
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// wypisanie wykresu temperatury dla danego dnia
 // function nextChart(){
 //   if(new Date(currentTimestamp).getDate()===w){
 //     newDate.setHours(newDate.getHours() - 120);
