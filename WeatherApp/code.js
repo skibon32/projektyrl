@@ -80,7 +80,7 @@ class WeatherApp{
         
         let place=this.cityInput.value;
         if(place=="") return;
-        return fetch(`http://api.openweathermap.org/geo/1.0/direct?q=${place}&limit=5&appid=${this.apikey}`)
+        return fetch(`https://api.openweathermap.org/geo/1.0/direct?q=${place}&limit=5&appid=${this.apikey}`)
           
         .then(
           res=>{
