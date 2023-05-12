@@ -5,6 +5,7 @@ class WeatherApp{
     cityInput=document.querySelector("#city-input");
     menuState=false;
     
+    autocomplete=document.querySelector(".autocomplete-city");
     currentWindow=0;
     lon=undefined;
     lat=undefined;
@@ -61,7 +62,22 @@ class WeatherApp{
       }
       
     }
+    autocompleteLi(data){
+      return `<div class="autocomplete-container">
+      <div class="autocomplete-name-country"><div class="m-1">${data.local_names?.pl || data.name}</div>
+      <div class="m-1">${data.country}</div></div>
+      <div class="">${data.state|| ""}</div>
+      <div class="map-button"><a href="https://www.google.com/maps/@${data.lat},${data.lon},15.0z" target="_blank"><button onClick="event.stopPropagation()"class="fa fa-solid fa-street-view rounded-circle p-1"></button></a>
+    </div>`;
+      
+      
+
+    }
+    autocompleteErase(){
+      this.autocomplete.innerHTML="";
+    }
     async getDataByLocation(){
+        
         let place=this.cityInput.value;
         if(place=="") return;
         return fetch(`http://api.openweathermap.org/geo/1.0/direct?q=${place}&limit=5&appid=${this.apikey}`)
@@ -71,11 +87,19 @@ class WeatherApp{
             if(res.ok)return res.json()
         })
         .then(data=>{
-            console.log(data)
-            this.lon=data[1].lon;
-            this.lat=data[1].lat;
-            data[1]?.local_names?.pl ?this.cityName=data[1].local_names.pl:this.cityName=data[1].name;
-            this.refresh();
+          this.autocompleteErase();
+          data.forEach((el)=>{
+            const newchild=document.createElement("div")
+            newchild.innerHTML=this.autocompleteLi(el);
+            newchild.addEventListener("click",(e)=>{
+              this.lat=el.lat;
+              this.lon=el.lon;
+              this.autocompleteErase();
+              this.refresh();
+            })
+            this.autocomplete.appendChild(newchild);
+          
+          })
         })
         .catch(error=>console.log(error))
         
@@ -105,7 +129,7 @@ class WeatherApp{
           },
           (error) => {
             document.querySelector("#gpsmodal").showModal();
-            document.querySelectorAll(".nav-options>li").forEach(el=>el.classList.add("disabled"))
+            document.querySelector(".nav-aside").classList.add("active")
           }
         );
       });
@@ -119,6 +143,7 @@ class WeatherApp{
     async insertData(){
         let precipitation;
         const data=await this.fetchDataByCoords()
+        
         //przypisanie wartości do preception rain lub snow jeżeli api zwróci wartość
         if(data.hasOwnProperty('rain'))precipitation=data.rain["1h"];
         else if(data.hasOwnProperty('snow'))precipitation=data.snow["1h"];
@@ -228,7 +253,7 @@ class WeatherApp{
       let i=0;
       let currentTimestamp=(new Date());
       let newDate = new Date(currentTimestamp)
-      
+      console.log(data)
       const groupByDate=this.groupDataByDate(data);
       if(Object.keys(groupByDate)[0]!=(currentTimestamp).getDate()){
           newDate.setHours(newDate.getHours() + 24);
@@ -266,30 +291,18 @@ class WeatherApp{
       }
     chart=async()=>{
     const data=await this.forecastFetch();
-    const groupByData=this.groupDataByDate(data);
-    main.innerHTML=`<div class="chart-container"><button id="previous-chart" class="chart-buttons fa fa-arrow-left fa-soild"></button><canvas id="myChart"></canvas><button id="next-chart" class="chart-buttons fa fa-arrow-right fa-soild"></button></div>`
+    let datalist=data.list
+    main.innerHTML=`<div class="chart-container"><canvas id="myChart"></canvas></div>`
     this.currentWindow=2;
-    let labels=["00:00","03:00","06:00","09:00","12:00","15:00","18:00","21:00"];
-    let currentTimestamp=(new Date());
-    let newDate = new Date(currentTimestamp);
+    let temps=[];
+    let labels=[];
+    for(let i=0;i<=8;i++){
+      const labeltime=new Date(datalist[i].dt_txt);
+      temps.push(Math.round(datalist[i].main.temp))
+      labels.push(`${this.AddZeroTime(labeltime.getHours())}:${this.AddZeroTime(labeltime.getMinutes())}`) 
+    }
     
-    
-    function drawChart(){
-      
-      if (Chart.getChart('myChart')) {
-        Chart.getChart('myChart').destroy();
-      }
-      let temps=[]
-      
-      
-    let q=(new Date(groupByData[new Date(currentTimestamp).getDate()][0].dt_txt)).getHours()
-    let shiftamount=(labels.indexOf(`${app.AddZeroTime(q)}:00`))
-      for(let i=0;i<shiftamount;i++){
-        temps.push(null)
-      }
-      groupByData[new Date(currentTimestamp).getDate()].forEach((el)=>{
-        temps.push(Math.round(el.main.temp))
-      })
+
       const min=Math.min(...temps)-2;
       const max=Math.max(...temps)+2;
       var ctx = document.getElementById('myChart').getContext('2d');
@@ -298,7 +311,7 @@ class WeatherApp{
         data: {
           labels: labels,
           datasets: [{
-            label: `${groupByData[new Date(currentTimestamp).getDate()][0].dt_txt} °C `,
+            label: `Temperatura °C `,
             data: temps,
             fill: true,
             borderColor: 'rgb(255, 99, 132)',
@@ -331,39 +344,116 @@ class WeatherApp{
         }
       })
     }
-    drawChart();
-    let w=new Date().getDate()+5;
-  function nextChart(){
-    if(new Date(currentTimestamp).getDate()===w){
-      newDate.setHours(newDate.getHours() - 120);
-          currentTimestamp = newDate.getTime();
-    }
-    else{
-      newDate.setHours(newDate.getHours() + 24);
-      currentTimestamp = newDate.getTime();
-    }
-      
-          drawChart();
-  }
-  document.querySelector("#next-chart").addEventListener("click",nextChart);
-  function prevChart(){
-    if(new Date(currentTimestamp).getDate()===new Date().getDate()){
-      
-      
-      newDate.setHours(newDate.getHours() + 120);
-          currentTimestamp = newDate.getTime();
-    }
-    else{
-   
-    newDate.setHours(newDate.getHours() - 24);
-          currentTimestamp = newDate.getTime();}
-          drawChart();
-  }
-  document.querySelector("#previous-chart").addEventListener("click",prevChart);
+    
+ 
    }
   
     
-};
+
 const app=new WeatherApp();
 window.onload=app.init();
 
+
+
+// function nextChart(){
+//   if(new Date(currentTimestamp).getDate()===w){
+//     newDate.setHours(newDate.getHours() - 120);
+//         currentTimestamp = newDate.getTime();
+//   }
+//   else{
+//     newDate.setHours(newDate.getHours() + 24);
+//     currentTimestamp = newDate.getTime();
+//   }
+    
+//         drawChart();
+// }
+// document.querySelector("#next-chart").addEventListener("click",nextChart);
+// function prevChart(){
+//   if(new Date(currentTimestamp).getDate()===new Date().getDate()){
+    
+    
+//     newDate.setHours(newDate.getHours() + 120);
+//         currentTimestamp = newDate.getTime();
+//   }
+//   else{
+ 
+//   newDate.setHours(newDate.getHours() - 24);
+//         currentTimestamp = newDate.getTime();}
+//         drawChart();
+// }
+// document.querySelector("#previous-chart").addEventListener("click",prevChart);
+// chart=async()=>{
+//   const data=await this.forecastFetch();
+//   let datalist=data.list
+//   main.innerHTML=`<div class="chart-container"><button id="previous-chart" class="chart-buttons fa fa-arrow-left fa-soild"></button><canvas id="myChart"></canvas><button id="next-chart" class="chart-buttons fa fa-arrow-right fa-soild"></button></div>`
+//   this.currentWindow=2;
+//   let labels=["00:00","03:00","06:00","09:00","12:00","15:00","18:00","21:00"];
+//   let currentTimestamp=(new Date());
+//   let newDate = new Date(currentTimestamp);
+  
+//   if(Object.keys(groupByData)[0]!=(currentTimestamp).getDate()){
+//     newDate.setHours(newDate.getHours() + 24);
+//   }
+//   function drawChart(){
+    
+//     if (Chart.getChart('myChart')) {
+//       Chart.getChart('myChart').destroy();
+//     }
+//     let temps=[]
+    
+    
+//   let q=(new Date(groupByData[new Date(currentTimestamp).getDate()][0].dt_txt)).getHours()
+//   let shiftamount=(labels.indexOf(`${app.AddZeroTime(q)}:00`))
+//     for(let i=0;i<shiftamount;i++){
+//       temps.push(null)
+//     }
+//     groupByData[new Date(currentTimestamp).getDate()].forEach((el)=>{
+//       temps.push(Math.round(el.main.temp))
+//     })
+//     const min=Math.min(...temps)-2;
+//     const max=Math.max(...temps)+2;
+//     var ctx = document.getElementById('myChart').getContext('2d');
+//     var myChart = new Chart(ctx, {
+//       type: 'line',
+//       data: {
+//         labels: labels,
+//         datasets: [{
+//           label: `${groupByData[new Date(currentTimestamp).getDate()][0].dt_txt} °C `,
+//           data: temps,
+//           fill: true,
+//           borderColor: 'rgb(255, 99, 132)',
+//           tension: 0.2,
+//         },
+//       ]
+//       },
+//       options: {
+//         plugins: {
+//           legend: {
+//               labels: {     
+//                   font: {
+//                       size: 20
+//                   }
+//               }
+//           }
+//         },
+//         scales: {
+//           y: {
+//             min:min,
+//               max: max,
+//             ticks: {
+//               stepSize:1,
+//               fontSize: 50
+//             }
+//           }
+//         },
+//       responsive: true,
+//       maintainAspectRatio: false,
+//       }
+//     })
+//   }
+//   drawChart();
+  
+
+//  }
+
+  

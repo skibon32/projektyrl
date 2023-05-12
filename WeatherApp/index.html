@@ -32,7 +32,7 @@
     <dialog id="gpsmodal" class="flex-column">
       <p>Użytkownik ma zablokowane udostępnianie lokalizacji</p>
       <p>Wymagane jest podanie miasta</p>
-      <button id="modal-close"class="btn btn-primary"><label for="city-input">Close</label></button>
+      <button id="modal-close"class="btn btn-primary"><label for="city-input">Zamknij</label></button>
     </dialog>
     <header>
       <div class="nav-tools">
@@ -40,7 +40,7 @@
         <button id="nav-refresh" class="fa fa-refresh" title="Odśwież"></button>
         <button id="nav-local-gps" class="fa fa-map-marked" title="Pobierz Lokalizacje"></button>
       </div>
-       <h1 class="logo">Petarda Weather</h1>
+      <h1>WEBIE</h1>
     </header>
     <main>
       <aside class="nav-aside">
@@ -52,6 +52,7 @@
             class="form-control"
             placeholder="Miasto..."
             id="city-input"
+            autocomplete="off"
           />
           <input
             id="search"
@@ -60,12 +61,15 @@
             value="Szukaj"
           />
         </form>
+        <ul class="autocomplete-city">
+          
+        </ul>
       </div>
         <ul class="nav-options">
           <li id="weather-now">Pogoda Teraz</li>
           <li id="weather-weakly">Tygodniowa</li>
           <li id="weather-chart">Wykres Temperatur</li>
-          <li>Jakość Powietrza</li>
+          
         </ul>
       </aside>
       

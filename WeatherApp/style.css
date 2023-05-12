@@ -20,6 +20,61 @@ body{
     border:3px solid red;
     background-color: rgba(255, 144, 144, 0.959);
 }
+.input-container{
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    align-items: center;
+}
+.autocomplete-city{
+    position: absolute;
+    top:calc(100% + 5px);
+    left:0;
+    z-index: 5;
+    list-style: none;
+    margin: 0;
+    padding:0;
+    width: 100%;
+}
+.autocomplete-container{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    cursor: pointer;
+    transition: all 0.5s;
+    
+    background-color: rgba(34, 85, 255, 0.8);
+    padding: 0.5em;
+    border-bottom: 1px solid black;
+    font-size: 1.1em;
+    font-weight: 500;
+
+}
+.autocomplete-container:hover{
+    background-color: rgba(34, 85, 255,1);
+}
+.autocomplete-city>div,.autocomplete-container :is(:first-child){
+    border-radius: 1em 1em 0 0 ;
+}
+.autocomplete-city>div:last-child{
+    border-radius:0 0 1em 1em;
+}
+.map-button{
+    align-self: center;
+    font-size: 1.2em;
+    transition: all 0.5s;
+    
+}
+.map-button:hover{
+    transform: scale(1.2);
+}
+.autocomplete-name-country{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    align-items: center;
+}
 #gpsmodal{
     position: absolute;
     margin: auto;
@@ -57,7 +112,7 @@ header{
 
 .nav-tools button{
     width: 2.5em;
-    aspect-ratio: 1;
+    aspect-ratio: 1/1;
     margin: 0.2em;
     border-radius: 50%;
     background-color: rgba(255, 255, 255, 0.8);
@@ -110,7 +165,7 @@ main{
     border: 2px solid rgb(0, 0, 0);
     padding: 1em;
     margin-top: 1.5em;
-    border-radius: 30px;
+    border-radius: 1em;
     transition: all 300ms ;
     text-align: center;
     
@@ -161,8 +216,8 @@ main{
     padding: 0.5em;
 }
 #myChart{
-    display: flex;
-    max-width: 80%;
+    
+    max-width: 95%;
 }
 .chart-buttons{
     width: 50px;
@@ -208,12 +263,7 @@ main{
     align-items:center;
     justify-content: space-evenly;
 }
-.input-container{
-    display: flex;
-    flex-direction: column;
-    justify-content: space-around;
-    align-items: center;
-}
+
 #feelstemp::before{
     font:var(--fa-font-solid);
     content: "\f769";
@@ -362,6 +412,7 @@ main{
     color:rgb(68, 68, 68);
     font-size: 2.2rem;
 }
+
 @media screen and (max-width:1205px) {
     body{
         height: 100%;
