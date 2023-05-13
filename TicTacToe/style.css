@@ -24,9 +24,9 @@ background-size: contain;
 }
 .playground{
 display: grid;
-grid-template-columns: 1fr 1fr 1fr;
+grid-template-columns: repeat(3,minmax(75px,1fr));
 grid-template-rows: repeat(3,1fr);
-gap:10px;
+gap:minmax(3px,10px);
 width: auto;
 margin: 50px;
 padding: 20px;
@@ -58,4 +58,10 @@ header>div>h3{
     
     text-align: center;
     margin: 10px;
+}
+@media screen and (max-width:500px) {
+    .playground{
+        margin: 0;
+        padding: 5px;
+    }
 }
