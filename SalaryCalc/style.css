@@ -45,9 +45,7 @@ margin: 3em;
     flex-direction: column;
     width:clamp(250px,30%,500px) ;
 }
-table{
-    
-}
+
 #totalboss{
     width: 4em;
     display: inline;
