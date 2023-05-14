@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kalkulator Diety</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="shortcut icon" href="barbell.png" type="image/png">
+    <script src="script.js" defer></script>
+</head>
+<body>
+    <main>
+        <section class="hero">
+            <h1>Wylicz już teraz swoje zapotrzebowanie <span style="color:rgb(218, 141, 0)">bardzo łatwo!</span></h1>
+            <p>
+                Kalkulator zapotrzebowania kalorycznego pozwala dokładnie określić potrzebną liczbę kalorii dziennie.
+                 Prosty w użyciu, wystarczy podać kilka danych osobowych i poziomie aktywności fizycznej.
+                  Skorzystaj z niego aby lepiej planować dietę i osiągnąć swój cel związany z wagą.
+            </p>
+            <div class="button-container">
+                <button onClick="smoothScroll('#form')" id="seenow">Wypróbuj już teraz</button>
+                <button id="viewmore">Dowiedz się więcej</button>
+            </div>
+            <img src="FitnessIcon.svg" alt="Obraz Fitnesu">
+        </section>
+
+        <section class="section-calc">
+            
+                <div class="form-header">
+                    <h2>Kalkulator diety</h2>
+                    <p>wylicz swoje zapotrzebowanie</p>
+                </div>
+                <form id="form">
+                    <div >
+                        <div>Pleć</div>
+                        <label for="men">Mężczyzna</label>
+                        <input id="men"type="radio" data-val="men" name="gender" checked>
+                        <label for="women">Kobieta</label>
+                        <input id="women"type="radio" data-val="women" name="gender">
+                    </div>
+                    <div class="flex-col">
+                        <label for="age">Wiek</label> 
+                        <input id="age"  max="120" min="15" required type="number"name="age">
+                    </div>
+                    <div class="flex-col">
+                        <label for="weight">Waga</label>
+                        <input type="number" max="250" min="30" required id="weight" name="weight">
+                    </div>
+                    <div class="flex-col">
+                        <label for="height">Wzrost</label>
+                        <input type="number" max="250" min="100" required id="height" name="height">
+                    </div>
+                    <div class="flex-col">
+                        <label for="activitlevel">Poziom aktywności</label>
+                        <div>
+                            <select name="activitylevel" id="activitylevel">
+                                <option data-val="1.25">Brak aktywności fizycznej</option>
+                                <option data-val="1.45">Niska aktywność fizyczna</option>
+                                <option data-val="1.65">Średnia aktywność fizyczna</option>
+                                <option data-val="1.85">Wysoka aktywność fizyczna</option>
+                                <option data-val="2.2">Ekstremalna aktywność fizyczna</option>
+                            </select>
+                            <button id="help"></button>
+                        </div>
+                    </div>
+                    <div class="flex-col">
+                        <label for="goal">Cel diety</label>
+                        <select name="goal" id="goal">
+                            <option data-val="-400">Schudnięcie</option>
+                            <option data-val="0">Utrzymanie Wagi</option>
+                            <option data-val="300">Przynbranie na masie</option>
+                        </select>
+                    </div>
+                    <hr style="margin-bottom: 1em;">
+                    <button type="button" id="button-calculate">Oblicz</button>
+                </form>
+
+        </section>
+
+
+
+
+
+
+
+    </main>
+</body>
+</html>
