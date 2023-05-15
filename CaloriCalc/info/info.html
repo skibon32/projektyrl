@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Info</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@100;400;500&display=swap');
+        *{
+            margin: 0;
+            padding: 0;
+            font-family:'Roboto', sans-serif;
+        }
+        body{
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        main{
+            width:clamp(300px,60%,850px) ;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        p{
+            margin: 1em;
+            font-size:clamp(15px,2vw,20px);
+            color: rgb(102, 102, 102);
+        }
+        #button-back{
+            padding: 1em 2em;
+            border-radius: 2em;
+            border: 0;
+            background-color:rgb(218, 141, 0) ;
+            color: white;
+            font-size: clamp(10px,4vw,20px);
+
+        }
+        #button-back:hover{
+            background-color: rgb(156, 102, 0);
+            
+        }
+        
+    </style>
+    
+</head>
+<body>
+    <main>
+        <h1>Info</h1>
+        <p>
+        Kalkulator zapotrzebowania kalorycznego to narzędzie, które pozwala Ci dokładnie określić,
+         ile kalorii potrzebujesz każdego dnia, aby utrzymać swoją wagę lub schudnąć
+         . Dzięki niemu możesz lepiej planować swoją dietę i zwiększyć swoje szanse na osiągnięcie celu.
+          Skorzystanie z kalkulatora jest proste i szybkie, wystarczy podać kilka podstawowych informacji,
+           takie jak wiek, płeć, wzrost, wagę i poziom aktywności fizycznej,
+            a następnie kalkulator wyliczy dla Ciebie dzienne zapotrzebowanie kaloryczne.
+             To świetny sposób na to, aby lepiej kontrolować swoje odżywianie i osiągnąć swój cel związany z wagą.
+              Skorzystaj z kalkulatora już dziś i zacznij odkrywać swoje zapotrzebowanie kaloryczne!
+            </p>
+        <p>Kalkulator zapotrzebowania kalorycznego oparty jest na wzorze Harrisa-Benedicta,
+         który jest jednym z najpopularniejszych i najdokładniejszych sposobów określenia dziennego zapotrzebowania kalorycznego.
+          Wzór ten uwzględnia czynniki takie jak płeć, wiek, wzrost, wagę oraz poziom aktywności fizycznej.
+           Dzięki temu jest w stanie dokładnie określić ilość kalorii potrzebnych do utrzymania obecnej wagi lub do utraty lub przyrostu masy ciała.
+            Skorzystanie z kalkulatora zapotrzebowania kalorycznego opartego na wzorze Harrisa-Benedicta pozwala na bardziej świadome planowanie diety i
+             monitorowanie postępów w osiąganiu celów związanych z wagą.
+            </p>
+            <a href="../index.html"><button id="button-back">Wróć do kalkulatora</button></a>
+    </main>
+</body>
+</html>
