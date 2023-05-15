@@ -59,6 +59,14 @@ class WeatherApp{
           this.cityInput.setAttribute("required","");
           document.querySelector("#gpsmodal").close()});
     }
+    loader(){
+      let el=document.createElement("div")
+      el.classList.add("loading");
+      document.querySelector("body").appendChild(el);
+    }
+    removeLoader(){
+      document.querySelector(".loading").remove();
+    }
     refresh=()=>{
       //odświezenie dla aktulanej kategorii po numerze
       switch(this.currentWindow){
@@ -165,8 +173,9 @@ class WeatherApp{
     }
     async insertData(){
         let precipitation;
+        this.loader();
         const data=await this.fetchDataByCoords()
-        
+        this.removeLoader();
         //przypisanie wartości do preception rain lub snow jeżeli api zwróci wartość
         if(data.hasOwnProperty('rain'))precipitation=data.rain["1h"];
         else if(data.hasOwnProperty('snow'))precipitation=data.snow["1h"];
@@ -281,7 +290,9 @@ class WeatherApp{
       </div>`;
     }
     async insertForecastData(){
+      this.loader()
       const data=await this.forecastFetch();
+      this.removeLoader()
       let i=0;
       let currentTimestamp=(new Date());
       let newDate = new Date(currentTimestamp)
@@ -319,73 +330,77 @@ class WeatherApp{
         }
       }
     chart=async()=>{
-    const data=await this.forecastFetch();
-    let datalist=data.list
-    this.menuState=false;
-    document.querySelector(".nav-aside").classList.remove("active");
-    main.innerHTML=`<div class="chart-container"><canvas id="myChart"></canvas></div>`
-    this.currentWindow=2;
-    let temps=[];
-    let labels=[];
-    for(let i=0;i<=8;i++){
-      //dodanie 8 następnych danych z arraya do wykresu
-      const labeltime=new Date(datalist[i].dt_txt);
-      //pushowanie temperatury z danej godziny
-      temps.push(Math.round(datalist[i].main.temp))
-      //pushowanie czasu do label
-      labels.push(`${this.AddZeroTime(labeltime.getHours())}:${this.AddZeroTime(labeltime.getMinutes())}`) 
-    }
-    
+      this.loader()
       
-      const min=Math.min(...temps)-2;
-      //dodanie 2 kolejnych liczb pod najniższa temperature z dnia
-
-      const max=Math.max(...temps)+2;
-      //dodanie 2 kolejnych liczb nad najwyższą temperature z dnia
-
-      var ctx = document.getElementById('myChart').getContext('2d');
-      var myChart = new Chart(ctx, {
-        type: 'line',
-        data: {
-          labels: labels,
-          datasets: [{
-            label: `Temperatura °C `,
-            data: temps,
-            fill: true,
-            borderColor: 'rgb(255, 99, 132)',
-            tension: 0.2,
+        const data= await this.forecastFetch();
+        this.removeLoader()
+      let datalist=data.list
+      this.menuState=false;
+      document.querySelector(".nav-aside").classList.remove("active");
+      main.innerHTML=`<div class="chart-container"><canvas id="myChart"></canvas></div>`
+      this.currentWindow=2;
+      let temps=[];
+      let labels=[];
+      for(let i=0;i<=8;i++){
+        //dodanie 8 następnych danych z arraya do wykresu
+        const labeltime=new Date(datalist[i].dt_txt);
+        //pushowanie temperatury z danej godziny
+        temps.push(Math.round(datalist[i].main.temp))
+        //pushowanie czasu do label
+        labels.push(`${this.AddZeroTime(labeltime.getHours())}:${this.AddZeroTime(labeltime.getMinutes())}`) 
+      }
+      
+        
+        const min=Math.min(...temps)-2;
+        //dodanie 2 kolejnych liczb pod najniższa temperature z dnia
+  
+        const max=Math.max(...temps)+2;
+        //dodanie 2 kolejnych liczb nad najwyższą temperature z dnia
+  
+        var ctx = document.getElementById('myChart').getContext('2d');
+        var myChart = new Chart(ctx, {
+          type: 'line',
+          data: {
+            labels: labels,
+            datasets: [{
+              label: `Temperatura °C `,
+              data: temps,
+              fill: true,
+              borderColor: 'rgb(255, 99, 132)',
+              tension: 0.2,
+            },
+          ]
           },
-        ]
-        },
-        options: {
-          plugins: {
-            legend: {
-                labels: {     
-                    font: {
-                        size: 20
-                    }
-                }
-            }
-          },
-          scales: {
-            y: {
-              min:min,
-                max: max,
-              ticks: {
-                stepSize:1,
-                fontSize: 50
+          options: {
+            plugins: {
+              legend: {
+                  labels: {     
+                      font: {
+                          size: 20
+                      }
+                  }
               }
-            }
-          },
-        responsive: true,
-        maintainAspectRatio: false,
-        }
-      })
-    }
+            },
+            scales: {
+              y: {
+                min:min,
+                  max: max,
+                ticks: {
+                  stepSize:1,
+                  fontSize: 50
+                }
+              }
+            },
+          responsive: true,
+          maintainAspectRatio: false,
+          }
+        })
+      
+    
     
  
-   }
-  
+    }
+}
     
 
 const app=new WeatherApp();

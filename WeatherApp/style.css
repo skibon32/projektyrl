@@ -16,6 +16,24 @@ body{
    background-blend-mode: multiply;
     
 }
+.loading{
+    position: fixed;
+    top:50%;
+    left:calc(50% - 75px);
+    
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    border:15px solid gray;
+    border-top:solid 15px #3498db;
+    
+    animation: spin 1s linear infinite;
+
+}
+@keyframes spin{
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
 #city-input:invalid{
     border:3px solid red;
     background-color: rgba(255, 144, 144, 0.959);
@@ -117,6 +135,7 @@ header{
     height: 100%;
    padding: 0.5em;
    align-items: center;
+   
 }
 
 
