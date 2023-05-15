@@ -135,7 +135,7 @@ input:invalid{
 }
 select{
     padding: 0.5em;
-    min-width: 300px;
+    
     font-size: 1em;
     border: 1px solid rgb(141, 141, 141) ;
     border-radius: 0.5em;
@@ -211,5 +211,19 @@ dialog p:nth-child(3){
     }
     .button-container{
         gap:5%;
+    }
+    form{
+        width: 100%;
+    }
+    .section-calc{
+        padding: 5%;
+    }
+    dialog{
+        padding: 1%;
+        font-size: 0.7em;
+    }
+    .help-item{
+        margin: 1em 0.5em;
+        
     }
 }
