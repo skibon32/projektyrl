@@ -18,11 +18,12 @@ function calculate(){
     }
         return((ppm*activitylevel+(ppm*0.1)+goallevel).toFixed(1));
 }
-document.querySelector("#button-calculate").addEventListener("click",(e)=>{
-    
+document.querySelector("#form").addEventListener("submit",(e)=>{
+    e.preventDefault()
     createModal()
     document.querySelector("dialog").showModal();
 })
+
 function smoothScroll(target){
     const el=document.querySelector(target)
     const position=el.offsetTop;
@@ -33,6 +34,7 @@ function smoothScroll(target){
     })
 
 }
+
 function createModal(){
     console.log("działa")
   let el=document.createElement("dialog")
@@ -46,4 +48,16 @@ function createModal(){
     document.querySelector("dialog").remove();
    })
 
+}
+window.addEventListener("scroll",reveal)
+function reveal(){
+    const revealcards=document.querySelectorAll(".reveal");
+    revealcards.forEach((el)=>{
+        let windowheight=window.innerHeight;
+        let revealtop=el.getBoundingClientRect().top;
+        let revaelpoint=150;
+        if(revealtop<windowheight-revaelpoint){
+            el.classList.add("active");
+        }
+    })
 }

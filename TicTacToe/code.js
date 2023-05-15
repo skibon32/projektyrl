@@ -41,17 +41,17 @@ class Game {
   }
   addSign(e) {
     if (e.target.innerText == "") {
-      if (this.playerturn === true) {
+      if (this.playerturn) {
         e.target.innerText = "X";
-        this.playerturn = false;
+        this.playerturn = !this.playerturn;
         this.player1array.push(Number(e.target.getAttribute("square_index")));
-        console.log(this.player1array, "Gracz X");
+        
         this.checkWinner();
       } else {
         e.target.innerText = "O";
-        this.playerturn = true;
+        this.playerturn = !this.playerturn;
         this.player2array.push(Number(e.target.getAttribute("square_index")));
-        console.log(this.player2array, "Gracz O");
+        
         this.checkWinner();
       }
     } else {
