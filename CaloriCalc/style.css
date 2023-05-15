@@ -144,17 +144,19 @@ dialog{
     top:50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    padding: 4em;
+    padding: 2em;
     display: flex;
     flex-direction: column;
     justify-content: center;
     gap: 1em;
     align-items: center;
+    border-radius: 1em;
+    border: 1px solid black;
 }
 dialog *{
     text-align: center;
 }
-#button-close{
+#button-close,#help-close{
     padding: 1em 2em;
     background-color: rgb(218, 141, 0);
     color:white;
@@ -165,6 +167,11 @@ dialog *{
 dialog p:nth-child(3){
     font-size: 3em;
 }
+.gender{
+    display: flex;
+    gap: 1em;
+
+}
 .reveal{
     opacity: 0;
     transform: translateY(150px);
@@ -173,6 +180,29 @@ dialog p:nth-child(3){
 .reveal.active{
     opacity: 1;
     transform: translateY(0px);
+}
+.help-item{
+    margin: 1em;
+    
+}
+.help-item>h3{
+    color:rgb(218, 141, 0)
+}
+.activity-row{
+    display: flex;
+    justify-content: space-between;
+    gap:0.5em
+    
+}
+.activity-row select{
+    flex-grow: 1;
+}
+#help{
+    font-size:1.5em;
+    border-radius: 5px;
+    border: 1px solid rgb(141, 141, 141);
+    padding: 0.2em;
+    
 }
 @media screen and (max-width:800px) {
     .hero{

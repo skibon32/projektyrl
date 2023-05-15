@@ -34,9 +34,44 @@ function smoothScroll(target){
     })
 
 }
+document.querySelector("#help").addEventListener("click",()=>{
+    helpmodal();
+    document.querySelector("dialog").showModal();
+})
+function helpmodal(){
+    let el=document.createElement("dialog");
+    el.innerHTML=`<div>
+    <div class="help-item">
+        <h3>Brak aktywności fizycznej</h3>
+        <p>Osoba, która nie wykonuje żadnych regularnych ćwiczeń fizycznych, spędza większość czasu w pozycji siedzącej lub leżącej.</p>
+    </div>
+    <div class="help-item">
+        <h3>Niska aktywność fizyczna</h3>
+        <p>Osoba, która pracuje głównie w pozycji siedzącej, ale wykonuje nieznaczną ilość dodatkowej aktywności fizycznej.</p>
+    </div>
+    <div class="help-item">
+        <h3>Umiarkowana aktywność fizyczna</h3>
+        <p>Osoba, która pracuje głównie nie fizycznie i trenuje 2 razy w tygodniu.</p>
+    </div>
+    <div class="help-item">
+        <h3>Wysoka aktywność fizyczna</h3>
+        <p>Osoba, która pracuje lekko fizycznie i trenuje 3-4 razy w tygodniu.</p>
+    </div>
+    <div class="help-item">
+        <h3>Ekstremalna aktywność fizyczna</h3>
+        <p>Osoba, która pracuje ciężko fizycznie i trenuje codziennie.</p>
+    </div>
+    <button id="help-close">Zamknij</button>
+</div>`
+    calcsection.append(el);
+    document.querySelector("#help-close").addEventListener("click",()=>{
+        document.querySelector("dialog").close()
+        document.querySelector("dialog").remove();
+    })
 
+}
 function createModal(){
-    console.log("działa")
+    
   let el=document.createElement("dialog")
    el.innerHTML=`<h2>Wynik</h2>
    <p>Twoje zapotrzebowanie kaloryczne</p>
