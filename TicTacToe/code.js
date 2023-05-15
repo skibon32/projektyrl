@@ -61,7 +61,7 @@ class Game {
   checkWinner() {
     for (let i = 0; i < this.wincombination.length; i++) {
       if (this.wincombination[i].every((el) => this.player1array.includes(el))) {
-        console.log("Wygrywa gracz X");
+        
         document.querySelector(".modal-body").innerText="Wygrywa Gracz 1";
         this.scoreX++;
         this.draw=false;
@@ -71,7 +71,7 @@ class Game {
         
       }
       else if (this.wincombination[i].every((el) => this.player2array.includes(el))) {
-        console.log("Wygrywa gracz O");
+       
         document.querySelector(".modal-body").innerText="Wygrywa Gracz 2";
         this.scoreO++;
         this.draw=false;
